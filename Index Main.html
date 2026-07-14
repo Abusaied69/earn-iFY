@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WS Tech Earning App</title>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Your Monetag / SDK Link Added Here -->
+    <script src='//libtl.com/sdk.js' data-zone='11288505' data-sdk='show_11288505'></script>
+
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0d121f;
+            --card-bg: #182235;
+            --primary-accent: #2b70e4;
+            --success-color: #00e676;
+            --danger-color: #ff3d00;
+            --text-color: #ffffff;
+            --text-secondary: #8d9ba8;
+            --border-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            background: linear-gradient(180deg, #101626 0%, #080b13 100%);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        .top-header {
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: rgba(24, 34, 53, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid #a855f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-fallback {
+            color: #ffffff;
+            font-size: 8px;
+            font-weight: 900;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .logo-fallback span {
+            color: #e879f9;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .user-balance {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--success-color);
+            margin-top: 2px;
+        }
+
+        /* Main Content Scrollable Area */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 90px;
+        }
+
+        /* Utility Card styles */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .stat-card {
+            background-color: rgba(24, 34, 53, 0.6);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .earn-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(16, 22, 38, 0.4);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .earn-option:last-child {
+            margin-bottom: 0;
+        }
+
+        .earn-details {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .earn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background-color: rgba(43, 112, 228, 0.15);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: var(--primary-accent);
+        }
+
+        .earn-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .earn-reward {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--success-color);
+            margin-top: 3px;
+        }
+
+        .earn-reward-sub {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .btn {
+            background-color: var(--primary-accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            opacity: 0.9;
+        }
+
+        .balance-box {
+            background-color: rgba(0, 230, 118, 0.08);
+            border: 1px solid rgba(0, 230, 118, 0.2);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .balance-box-label {
+            font-size: 14px;
+            color: var(--success-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .balance-box-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+
+        .alert-text {
+            color: #ef4444;
+            font-size: 12px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .method-btn {
+            flex: 1;
+            background-color: #1e293b;
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .method-btn.selected {
+            border-color: #ec4899;
+            background-color: rgba(236, 72, 153, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            background-color: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #4b5563;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .referral-box {
+            background-color: #1e293b;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .referral-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px;
+            color: white;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .copy-btn {
+            background-color: var(--primary-accent);
+            border: none;
+            color: white;
+            padding: 12px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .profile-header-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #3b82f6;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-id {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .edit-profile-btn {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: var(--text-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .profile-stat-box {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .profile-stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .profile-stat-val {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .detail-val {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background-color: #111a2e;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: #3b82f6;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .toast {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background-color: #1e293b;
+            border-left: 4px solid var(--primary-accent);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 999;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease-out;
+            width: 85%;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast">Successfully credited!</div>
+
+    <div class="app-container">
+        
+        <!-- Top Sticky Header -->
+        <div class="top-header">
+            <!-- Logo Circle now updates dynamically with User Image -->
+            <div class="logo-circle" id="user-avatar-container">
+                <div class="logo-fallback" id="avatar-fallback">WS<br><span>TECH</span></div>
+            </div>
+            <div class="user-info">
+                <!-- User name updates dynamically here -->
+                <span class="user-name" id="top-user-name">Loading...</span>
+                <span class="user-balance">Balance: $<span class="global-balance">0.20</span></span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            
+            <!-- Tab 1: EARN TAB -->
+            <div id="earn-tab" class="tab-panel active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Ads Watched Today</div>
+                        <div class="stat-value"><span id="ads-count">0</span>/300</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Referrals</div>
+                        <div class="stat-value"><span class="global-referrals">0</span></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="section-title">Earn Money</h3>
+                    
+                    <div class="earn-option">
+                        <div class="earn-details">
+                            <div class="earn-icon">
+                                <i class="fa-solid fa-tv"></i>
+                            </div>
+                            <div>
+                                <div class="earn-title">Watch Sponsor Ad</div>
+                                <div class="earn-reward">Reward: $0.01</div>
+                                <div class="earn-reward-sub"><span id="ads-count-sub">0</span> out of 300 completed today</div>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="watchAd()">Watch Ad</button>
+                    </div>
+
+                    <div class="earn-option">
+                        <div class="earn-details">
+                            <div class="earn-icon">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div>
+                                <div class="earn-title">Refer a friend</div>
+                                <div class="earn-reward">Reward: $0.20 per invite</div>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="switchTab('referral')">Invite</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: WITHDRAW TAB -->
+            <div id="withdraw-tab" class="tab-panel">
+                <div class="card">
+                    <h3 class="section-title" style="margin-bottom: 20px;">Withdraw Funds</h3>
+                    
+                    <div class="balance-box">
+                        <div class="balance-box-label">Current Balance</div>
+                        <div class="balance-box-value">$<span class="global-balance">0.20</span></div>
+                    </div>
+
+                    <div class="alert-text">* Minimum withdrawal amount is $3</div>
+
+                    <div class="form-group">
+                        <label>Select Payment Method</label>
+                        <div class="payment-methods">
+                            <button class="method-btn selected" onclick="selectMethod(this, 'bKash')">bKash</button>
+                            <button class="method-btn" onclick="selectMethod(this, 'Nagad')">Nagad</button>
+                            <button class="method-btn" onclick="selectMethod(this, 'Rocket')">Rocket</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Amount ($)</label>
+                        <input type="number" id="withdraw-amount" class="form-input" placeholder="Min. $3.00" min="3" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="text" id="account-number" class="form-input" placeholder="Enter mobile banking number">
+                    </div>
+
+                    <button class="submit-btn" onclick="handleWithdraw()">Submit Request</button>
+                </div>
+            </div>
+
+            <!-- Tab 3: REFERRAL TAB -->
+            <div id="referral-tab" class="tab-panel">
+                <div class="card">
+                    <h3 class="section-title">Invite Friends & Earn</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                        Share your referral link with friends to earn $0.20 for each friend who signs up.
+                    </p>
+                    
+                    <div class="referral-box">
+                        <input type="text" id="ref-link" class="referral-input" readonly value="https://t.me/YourBot?start=ref_8652222196">
+                        <button class="copy-btn" onclick="copyReferralLink()">Copy Link</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: PROFILE TAB -->
+            <div id="profile-tab" class="tab-panel">
+                <div class="card profile-header-card">
+                    <!-- Profile Avatar updates dynamically -->
+                    <div class="profile-avatar" id="main-profile-avatar">
+                        <div class="logo-fallback" style="font-size: 14px;">WS<br><span style="color: #ec4899;">TECH</span></div>
+                    </div>
+                    <h2 class="profile-name" id="main-profile-name">Loading...</h2>
+                    <div class="profile-id" id="main-profile-id">ID: 8652222196</div>
+                    <button class="edit-profile-btn" onclick="showToast('Edit profile feature simulated.')">Edit Profile</button>
+                </div>
+
+                <div class="profile-stats-grid">
+                    <div class="profile-stat-box">
+                        <div class="profile-stat-label">Current Balance</div>
+                        <div class="profile-stat-val">$<span class="global-balance">0.20</span></div>
+                    </div>
+                    <div class="profile-stat-box">
+                        <div class="profile-stat-label">Join Date</div>
+                        <div class="profile-stat-val">15/07/2026</div>
+                    </div>
+                </div>
+
+                <div class="profile-stats-grid" style="margin-bottom: 20px;">
+                    <div class="profile-stat-box">
+                        <div class="profile-stat-label">Total Ads</div>
+                        <div class="profile-stat-val"><span id="profile-total-ads">0</span></div>
+                    </div>
+                    <div class="profile-stat-box">
+                        <div class="profile-stat-label">Total Referrals</div>
+                        <div class="profile-stat-val"><span class="global-referrals">0</span></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="section-title" style="font-size: 14px; margin-bottom: 12px;">Account Statistics</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Total Earnings</span>
+                        <span class="detail-val">$<span class="global-balance">0.20</span></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Fixed Bottom Navigation Bar -->
+        <div class="bottom-nav">
+            <div class="nav-item active" id="nav-earn" onclick="switchTab('earn')">
+                <i class="fa-solid fa-chart-simple"></i>
+                Earn
+            </div>
+            <div class="nav-item" id="nav-withdraw" onclick="switchTab('withdraw')">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+                Withdraw
+            </div>
+            <div class="nav-item" id="nav-referral" onclick="switchTab('referral')">
+                <i class="fa-solid fa-user-group"></i>
+                Referral
+            </div>
+            <div class="nav-item" id="nav-profile" onclick="switchTab('profile')">
+                <i class="fa-solid fa-user"></i>
+                Profile
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let balance = parseFloat(localStorage.getItem('balance')) || 0.20;
+        let adsCount = parseInt(localStorage.getItem('adsCount')) || 0;
+        let totalReferrals = parseInt(localStorage.getItem('totalReferrals')) || 0;
+        let selectedMethod = 'bKash';
+
+        function initApp() {
+            updateUI();
+            
+            // Telegram WebApp initialization and fetching User Data
+            if (window.Telegram && window.Telegram.WebApp) {
+                const webapp = window.Telegram.WebApp;
+                webapp.ready();
+                webapp.expand();
+
+                // Get user info from Telegram
+                const user = webapp.initDataUnsafe ? webapp.initDataUnsafe.user : null;
+
+                if (user) {
+                    // Combine First name and Last name if available
+                    const fullName = (user.first_name + ' ' + (user.last_name || '')).trim();
+                    
+                    // Update User Names in header and profile
+                    document.getElementById('top-user-name').innerText = fullName;
+                    document.getElementById('main-profile-name').innerText = fullName;
+                    
+                    if (user.id) {
+                        document.getElementById('main-profile-id').innerText = "ID: " + user.id;
+                        document.getElementById('ref-link').value = "https://t.me/YourBot?start=ref_" + user.id;
+                    }
+
+                    // Update User Profile Photos if available
+                    if (user.photo_url) {
+                        const avatarContainer = document.getElementById('user-avatar-container');
+                        avatarContainer.innerHTML = `<img src="${user.photo_url}" alt="Profile">`;
+
+                        const mainProfileAvatar = document.getElementById('main-profile-avatar');
+                        mainProfileAvatar.innerHTML = `<img src="${user.photo_url}" alt="Profile">`;
+                    } else {
+                        // Fallback text if user doesn't have a profile photo
+                        setFallbackAvatar(fullName);
+                    }
+                } else {
+                    // Fallback for regular browsers
+                    setDefaultUserData();
+                }
+            } else {
+                // Fallback for regular browsers
+                setDefaultUserData();
+            }
+        }
+
+        function setDefaultUserData() {
+            document.getElementById('top-user-name').innerText = "Guest User";
+            document.getElementById('main-profile-name').innerText = "Guest User";
+            setFallbackAvatar("Guest User");
+        }
+
+        function setFallbackAvatar(name) {
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            const fallbackHTML = `<div class="logo-fallback" style="font-size: 14px; font-weight:bold;">${initials}</div>`;
+            document.getElementById('user-avatar-container').innerHTML = fallbackHTML;
+            document.getElementById('main-profile-avatar').innerHTML = fallbackHTML;
+        }
+
+        function updateUI() {
+            document.querySelectorAll('.global-balance').forEach(el => {
+                el.innerText = balance.toFixed(2);
+            });
+            document.querySelectorAll('.global-referrals').forEach(el => {
+                el.innerText = totalReferrals;
+            });
+            document.getElementById('ads-count').innerText = adsCount;
+            document.getElementById('ads-count-sub').innerText = adsCount;
+            document.getElementById('profile-total-ads').innerText = adsCount;
+            
+            localStorage.setItem('balance', balance);
+            localStorage.setItem('adsCount', adsCount);
+            localStorage.setItem('totalReferrals', totalReferrals);
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-panel').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.classList.remove('active');
+            });
+
+            document.getElementById(tabName + '-tab').classList.add('active');
+            document.getElementById('nav-' + tabName).classList.add('active');
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            if (isError) {
+                toast.style.borderLeftColor = 'var(--danger-color)';
+            } else {
+                toast.style.borderLeftColor = 'var(--primary-accent)';
+            }
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function watchAd() {
+            if (adsCount >= 300) {
+                showToast("You have reached your limit of 300 ads for today!", true);
+                return;
+            }
+
+            showToast("Playing Sponsor Ad... (10s)");
+
+            setTimeout(() => {
+                adsCount++;
+                balance += 0.01;
+                updateUI();
+                showToast("Ad watched successfully! $0.01 added to balance.");
+            }, 1500);
+        }
+
+        function selectMethod(button, method) {
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            button.classList.add('selected');
+            selectedMethod = method;
+        }
+
+        function handleWithdraw() {
+            const amountInput = document.getElementById('withdraw-amount');
+            const accountInput = document.getElementById('account-number');
+            const amount = parseFloat(amountInput.value);
+            const account = accountInput.value.trim();
+
+            if (isNaN(amount) || amount < 3) {
+                showToast("Minimum withdrawal amount is $3.00", true);
+                return;
+            }
+
+            if (amount > balance) {
+                showToast("Insufficient balance!", true);
+                return;
+            }
+
+            if (!account) {
+                showToast("Please enter a valid mobile banking account number.", true);
+                return;
+            }
+
+            balance -= amount;
+            updateUI();
+            amountInput.value = '';
+            accountInput.value = '';
+            showToast(`Withdrawal request of $${amount.toFixed(2)} sent via ${selectedMethod}!`);
+        }
+
+        function copyReferralLink() {
+            const refLink = document.getElementById('ref-link');
+            refLink.select();
+            refLink.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(refLink.value);
+            showToast("Referral link copied!");
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
